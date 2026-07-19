@@ -6,6 +6,8 @@ actually **join your host**.
 
 Free. No strings.
 
+**✅ Verified real** — each OS was diagnosed from its actual disk image in Ubuntu, and the netplay handshake was proven between two RetroArch clients (both joined, live ping). **[See the full proof →](PROOF.md)**
+
 ## What it fixes
 
 Two different bugs, depending on your OS:
