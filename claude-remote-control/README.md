@@ -1,25 +1,28 @@
 # Claude Remote-Control — Always On
 
 A small **sister program** for your PC that keeps Claude's own **Remote Control**
-running, so your **PC reliably shows up in the Claude app on your phone** and
-stays connected.
+running, so your **PC shows up in the Claude app's Devices list** and your
+sessions stay reconnectable.
 
-**The main problem it fixes:** with plain Remote Control, your computer often
-just *doesn't appear* in the phone app when you go to connect — the command is
-running but the link went stale. This re-announces the PC on a timer so it keeps
-popping back into the list, fresh, without you touching anything.
+**Why your PC "doesn't show up":** in the phone app, your computer only appears
+under **Devices** while `claude --remote-control` is actually running on it. When
+you close the terminal, the PC sleeps, or the session ends, the command stops —
+so the Devices box goes empty and your old session shows *"Disconnected."* The fix
+is simply to keep that command running. That's what this does.
 
 Everything it does:
 
-1. **Re-announces on a timer** so the PC keeps showing up in the app
-   (`REFRESH_MINUTES`, default 15). ← the fix for "it doesn't show up every time."
+1. **Keeps Remote Control running** with a stable device name, so your PC stays
+   in the Devices list and your session stays reconnectable.
 2. **Reconnects itself** if the link ever drops or crashes (restart loop).
 3. **Resumes the same session** you were already using — never a fresh chat
-   (`--continue`). The re-announce lands you back on that same conversation.
+   (`--continue`).
 4. **Reaches all the projects you list**, not just one folder (`--add-dir`).
+5. **Starts automatically at login**, so whenever the PC is on, it's already
+   running and your phone can connect.
 
-Plus it **starts automatically at login**, so whenever the PC is on, your phone
-can connect.
+Optional extra lever (`REFRESH_MINUTES`): if your PC is confirmed running but
+*still* won't appear, set it to re-announce every N minutes. Off (0) by default.
 
 This does **not** fake anything. Remote Control is Anthropic's real feature — the
 *"Connect your computer"* screen in the phone app. Under the hood the phone runs

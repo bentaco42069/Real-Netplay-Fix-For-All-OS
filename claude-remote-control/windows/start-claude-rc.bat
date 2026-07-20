@@ -29,11 +29,11 @@ set "EXTRA_DIRS="
 REM  Keep the same session (--continue). Set to "" to always start fresh.
 set "RESUME=--continue"
 
-REM  THE FIX for "it doesn't show up every time": re-announce every N minutes so
-REM  the PC keeps re-appearing in the app even if the link went stale while the
-REM  process was still alive. --continue lands you back on the same conversation.
-REM  Set to 0 to disable and only restart on an actual crash.
-set "REFRESH_MINUTES=15"
+REM  Extra lever if your PC STILL doesn't show up while this window is running:
+REM  re-announce every N minutes to force it back into the app's list. Leave at
+REM  0 for the simple, rock-solid "always running" mode (fixes the most common
+REM  cause). If it's confirmed running but still won't appear, set this to 15.
+set "REFRESH_MINUTES=0"
 
 REM ===========================================================================
 

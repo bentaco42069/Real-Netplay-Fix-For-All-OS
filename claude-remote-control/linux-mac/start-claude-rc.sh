@@ -28,11 +28,11 @@ EXTRA_DIRS=()
 # Keep the same session (--continue). Set to "" to always start fresh.
 RESUME="--continue"
 
-# THE FIX for "it doesn't show up every time": re-announce this many minutes so
-# the PC keeps re-appearing in the app's list even if the link went stale while
-# the process was still alive. --continue means the refresh lands you back on the
-# same conversation. Set to 0 to disable and only restart on an actual crash.
-REFRESH_MINUTES="${REFRESH_MINUTES:-15}"
+# Extra lever if your PC STILL doesn't show up while this is running: re-announce
+# every N minutes to force it back into the app's Devices list. Leave at 0 for the
+# simple, rock-solid "always running" mode (fixes the most common cause). If it's
+# confirmed running but still won't appear, set this to 15.
+REFRESH_MINUTES="${REFRESH_MINUTES:-0}"
 
 # ===========================================================================
 
