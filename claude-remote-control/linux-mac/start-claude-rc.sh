@@ -1,52 +1,69 @@
 #!/usr/bin/env bash
 # ============================================================================
-#  Claude Remote-Control - Always On   (the "sister program"), Linux/macOS.
+#  Claude Remote-Control - Always On   (the "sister program"), Linux/macOS/Deck.
 # ----------------------------------------------------------------------------
-#  Keeps `claude remote-control` running on THIS machine so the Claude app on
-#  your phone can always connect to it. If it drops or crashes, this relaunches
-#  it on its own -- so you stay connected without touching the terminal.
+#  Keeps Claude's Remote Control running so the Claude app on your phone stays
+#  connected -- and it:
+#    * RECONNECTS itself if the link ever drops               (restart loop)
+#    * RESUMES the SAME session you were using, not a new one (--continue)
+#    * reaches ALL the projects you list, not just one folder (--add-dir)
 #
-#  First time: run it once, finish any login/pairing, then open the Claude
-#  phone app and pick this computer from the list.
-#
-#  Auto-start at login:
-#    - Linux (systemd):  loginctl enable-linger + a user service, or add this
-#      script to your desktop's Startup Applications.
-#    - macOS: add it as a Login Item (System Settings > General > Login Items),
-#      or use the launchd plist noted in the README.
+#  Uses the real Claude Code flags (v2.1+):
+#    claude --remote-control [name] --continue --add-dir <dirs...>
 # ============================================================================
 set -u
 
-# ---- EDIT THIS: the project folder you want Claude to work in ---------------
+# ==== SETTINGS -- edit these ================================================
+
+# Stable name for this computer as it shows in the phone app:
+SESSION_NAME="${SESSION_NAME:-$(hostname)}"
+
+# Main project folder to resume in (--continue reopens the latest conversation
+# in THIS folder, so keep it the same each time):
 PROJECT_DIR="${1:-$HOME}"
 
+# All other project folders to reach in that one session (space-separated).
+# Example: EXTRA_DIRS=(--add-dir "$HOME/RagnarokOS" "$HOME/code/stuff")
+EXTRA_DIRS=()
+
+# Session behavior: --continue keeps the same session. Set RESUME="" to always
+# start fresh instead.
+RESUME="--continue"
+
+# ===========================================================================
+
 if ! command -v claude >/dev/null 2>&1; then
-  echo "[!] The 'claude' command was not found on your PATH."
-  echo "    Install or update Claude Code first, then run this again."
+  echo "[!] The 'claude' command was not found. Install/update Claude Code first."
   exit 1
 fi
 
 cd "$PROJECT_DIR" 2>/dev/null || {
   echo "[!] Project folder not found: $PROJECT_DIR"
-  echo "    Pass the folder as an argument:  ./start-claude-rc.sh /path/to/project"
   exit 1
 }
 
+# First run ever: no conversation yet -> start fresh, then always resume after.
+MARKER="$(cd "$(dirname "$0")" && pwd)/.rc-initialized"
+MODE="$RESUME"
+[ -e "$MARKER" ] || MODE=""
+
 echo "============================================================"
 echo "  Claude Remote-Control - Always On"
-echo "  Project: $(pwd)"
-echo "  Keeping 'claude remote-control' alive."
+echo "  Computer name : $SESSION_NAME"
+echo "  Project       : $(pwd)"
+echo "  Session       : keep-same ($RESUME)"
 echo "  Open the Claude app on your phone and pick this computer."
 echo "  (Ctrl-C to stop.)"
 echo "============================================================"
 
-# Ctrl-C should actually quit, not just restart the loop.
 trap 'echo; echo "[*] Stopped."; exit 0' INT TERM
 
 while true; do
-  claude remote-control
+  claude --remote-control "$SESSION_NAME" $MODE "${EXTRA_DIRS[@]}"
   code=$?
+  [ -e "$MARKER" ] || echo initialized > "$MARKER"
+  MODE="$RESUME"
   echo
-  echo "[!] remote-control stopped (code $code). Reconnecting in 3s..."
+  echo "[!] Remote Control stopped (code $code). Reconnecting in 3s..."
   sleep 3
 done

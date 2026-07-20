@@ -1,105 +1,93 @@
 # Claude Remote-Control — Always On
 
-A small **sister program** for your PC that keeps Claude's own **`claude
-remote-control`** running, so the **Claude app on your phone is always connected
-to your computer** — and reconnects itself if the link ever drops.
+A small **sister program** for your PC that keeps Claude's own **Remote Control**
+running, so the **Claude app on your phone stays connected to your computer** —
+and it fixes the three things you wanted:
 
-This does **not** replace or fake anything. `claude remote-control` (a.k.a.
-`claude rc`) is Anthropic's real feature — the one on the *"Connect your
-computer"* screen in the phone app. This just keeps it alive and starts it for
-you, so you never have to open a terminal and type the command again.
+1. **Reconnects itself** if the link ever drops (restart loop).
+2. **Resumes the same session** you were already using — never a fresh chat
+   (`--continue`).
+3. **Reaches all the projects you list**, not just one folder (`--add-dir`).
 
-- ✅ Runs `claude remote-control` on your PC and **relaunches it if it drops**.
-- ✅ **Starts automatically at login**, so whenever your PC is on, your phone can
-  connect.
-- ✅ Uses the **project folder you choose**, and connects to your **existing
-  Claude Code sessions** — it doesn't spin up a throwaway new one.
+Plus it **starts automatically at login**, so whenever the PC is on, your phone
+can connect.
+
+This does **not** fake anything. Remote Control is Anthropic's real feature — the
+*"Connect your computer"* screen in the phone app. Under the hood the phone runs
+`claude --remote-control`; this just launches it for you, keeps it alive, and
+points it at the right session and folders. (Real flags, verified against Claude
+Code v2.1: `claude --remote-control [name] --continue --add-dir <dirs...>`.)
 
 ---
 
 ## What you need first
 
-1. **Claude Code installed on the PC** and signed in. Check with:
-   `claude --version` in a terminal. (If `claude` isn't found, install/update
-   Claude Code first.)
-2. The **Claude app on your phone**, signed into the **same account**.
-
-That phone screen you saw — *"In a terminal on your computer… run
-`claude remote-control`… then come back here and select your computer"* — is
-exactly what this automates.
+1. **Claude Code on the PC**, signed in. Check: `claude --version` (needs 2.1+).
+2. The **Claude app on your phone**, same account.
 
 ---
 
-## Windows (your PC)
+## Windows
 
-Everything is in the `windows/` folder.
+Everything's in `windows/`.
 
-1. **Set your project folder.** Open `start-claude-rc.bat` in Notepad and edit
-   this line to the folder you want Claude working in (e.g. your Ragnarok work):
+1. **Open `start-claude-rc.bat` in Notepad** and set two things at the top:
+   - `PROJECT_DIR` — your main work folder (e.g. your Ragnarok folder). This is
+     the session `--continue` reopens, so keep it stable.
+   - `EXTRA_DIRS` — any other project folders you want reachable, e.g.
+     `set "EXTRA_DIRS=--add-dir C:\Users\you\RagnarokOS C:\code\stuff"`
+     (leave blank if you only use the one folder).
 
-       set "PROJECT_DIR=%USERPROFILE%"
-
-2. **First run — do it visibly once.** Double-click `start-claude-rc.bat`. Finish
-   any sign-in/pairing it asks for. Then open the Claude app on your phone and
-   **pick this computer** from the list. Confirm it connects.
+2. **First run — visible, once.** Double-click `start-claude-rc.bat`, finish any
+   sign-in, then open the Claude phone app and **pick this computer**. Confirm it
+   connects.
 
 3. **Make it always-on.** Double-click `install-autostart.bat`. From now on it
-   launches **hidden at every login** and keeps itself running. Your phone can
-   connect any time the PC is on.
-
-   To turn it back off: `uninstall-autostart.bat`.
+   launches hidden at every login, keeps itself alive, and drops you back into
+   the same session. Turn it off with `uninstall-autostart.bat`.
 
 ---
 
 ## Linux / macOS / Steam Deck
 
-Use `linux-mac/start-claude-rc.sh`:
+`linux-mac/start-claude-rc.sh` — same behavior:
 
     bash linux-mac/start-claude-rc.sh /path/to/your/project
 
-Auto-start at login:
-- **macOS:** System Settings → General → Login Items → add the script.
-- **Linux desktop:** add it to *Startup Applications*.
-- **systemd (headless):** a user service that runs the script with
-  `Restart=always` gives you the same "always on" behavior.
+Edit `SESSION_NAME`, `EXTRA_DIRS`, and `RESUME` at the top if you want. Auto-start
+at login: add it to macOS **Login Items**, Linux **Startup Applications**, or a
+`systemd --user` service with `Restart=always`.
 
 ---
 
-## How the "never disconnects" part works
+## How each feature works (the real flags)
 
-Two layers, so a dropped link fixes itself:
-
-1. **The phone ↔ PC link** is handled by Claude's own `remote-control` — the
-   phone app reconnects to your computer on its own while the command is
-   running.
-2. **The command itself** is kept alive by this wrapper: if `claude
-   remote-control` ever exits or crashes, the launcher waits a few seconds and
-   starts it again — forever, until you close the window. Combined with
-   auto-start at login, the only way you're *not* connected is if the PC is off.
-
----
-
-## Same session, not a new one
-
-Your conversations live in Claude Code on this PC. When you connect from the
-phone, you **pick the session you were already using** and keep going — remote
-control drives your real sessions, it doesn't create a fresh throwaway chat.
-Point the launcher at the same project folder each time and your work is right
-where you left it.
+- **Same session, not a new one (#1).** The launcher runs
+  `claude --remote-control "<PC name>" --continue`. `--continue` reopens the most
+  recent conversation in `PROJECT_DIR`, so every restart — even after a reboot —
+  lands you back in the session you were using. (First run ever has nothing to
+  continue, so it starts one and drops a `.rc-initialized` marker; every run
+  after that resumes.)
+- **All your projects (#2).** `EXTRA_DIRS` becomes `--add-dir <folders>`, giving
+  that one session tool access to every folder you list — so any work is
+  reachable, not just the main one.
+- **Never disconnects.** If `claude --remote-control` exits or crashes, the loop
+  waits 3s and relaunches. With auto-start at login, the only way you're not
+  connected is the PC being off.
 
 ---
 
 ## Honest notes
 
-- This is a **keep-alive + auto-start wrapper** around a real Anthropic command.
-  All the actual phone↔PC connecting is Claude's feature; the value here is that
-  you never have to babysit the terminal.
-- **Do the first login/pairing with the window visible** (step 2) before turning
-  on auto-start — a hidden window can't show you a sign-in prompt.
-- Needs `claude` on your PATH and a normal desktop login session. A powered-off
-  or logged-out PC obviously can't be connected to.
-- If Anthropic changes the command name or flags, update the one line in
-  `start-claude-rc.bat` / `.sh` that runs `claude remote-control`.
+- I built and tested this in a **cloud coding session**, where Claude Code itself
+  reports *"Remote Control is not available inside a cloud session"* — so I could
+  verify the **flags, the restart loop, and the resume logic** (all confirmed
+  with a mock), but the **real phone↔PC handshake can only run on your actual
+  PC**. Run step 2 on the PC to prove that last mile.
+- Keep `PROJECT_DIR` the same each time or `--continue` will resume a different
+  folder's conversation.
+- If Anthropic changes the flags, it's the one `claude --remote-control` line in
+  the script to update.
 
 ---
 
