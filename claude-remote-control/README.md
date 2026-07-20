@@ -1,13 +1,22 @@
 # Claude Remote-Control — Always On
 
 A small **sister program** for your PC that keeps Claude's own **Remote Control**
-running, so the **Claude app on your phone stays connected to your computer** —
-and it fixes the three things you wanted:
+running, so your **PC reliably shows up in the Claude app on your phone** and
+stays connected.
 
-1. **Reconnects itself** if the link ever drops (restart loop).
-2. **Resumes the same session** you were already using — never a fresh chat
-   (`--continue`).
-3. **Reaches all the projects you list**, not just one folder (`--add-dir`).
+**The main problem it fixes:** with plain Remote Control, your computer often
+just *doesn't appear* in the phone app when you go to connect — the command is
+running but the link went stale. This re-announces the PC on a timer so it keeps
+popping back into the list, fresh, without you touching anything.
+
+Everything it does:
+
+1. **Re-announces on a timer** so the PC keeps showing up in the app
+   (`REFRESH_MINUTES`, default 15). ← the fix for "it doesn't show up every time."
+2. **Reconnects itself** if the link ever drops or crashes (restart loop).
+3. **Resumes the same session** you were already using — never a fresh chat
+   (`--continue`). The re-announce lands you back on that same conversation.
+4. **Reaches all the projects you list**, not just one folder (`--add-dir`).
 
 Plus it **starts automatically at login**, so whenever the PC is on, your phone
 can connect.
@@ -62,6 +71,14 @@ at login: add it to macOS **Login Items**, Linux **Startup Applications**, or a
 
 ## How each feature works (the real flags)
 
+- **Keeps the PC showing up (the main fix).** Every `REFRESH_MINUTES` (default
+  15) the launcher stops and restarts `claude --remote-control`, which forces the
+  computer to re-announce itself to your account — so it keeps reappearing in the
+  phone app's list even when the old link went stale. Because it restarts *with*
+  `--continue`, you land back on the same conversation, so the refresh is nearly
+  invisible to you. Set `REFRESH_MINUTES=0` to turn this off and only restart on
+  an actual crash. If it ever refreshes mid-task and feels disruptive, raise the
+  number (e.g. 30 or 60).
 - **Same session, not a new one (#1).** The launcher runs
   `claude --remote-control "<PC name>" --continue`. `--continue` reopens the most
   recent conversation in `PROJECT_DIR`, so every restart — even after a reboot —

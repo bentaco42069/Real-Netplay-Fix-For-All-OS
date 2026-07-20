@@ -2,36 +2,38 @@
 REM ============================================================================
 REM  Claude Remote-Control - Always On   (the "sister program" for your PC)
 REM ----------------------------------------------------------------------------
-REM  Keeps Claude's Remote Control running on THIS PC so the Claude app on your
-REM  phone stays connected -- and it:
-REM    * RECONNECTS itself if the link ever drops               (restart loop)
-REM    * RESUMES the SAME session you were using, not a new one (--continue)
-REM    * reaches ALL the projects you list, not just one folder (--add-dir)
+REM  Fixes the real problem: your PC not reliably showing up in the phone app.
+REM    * RE-ANNOUNCES on a timer so the PC keeps showing up  (REFRESH_MINUTES)
+REM    * RECONNECTS if the link ever drops or crashes        (restart loop)
+REM    * RESUMES the SAME session, not a new one             (--continue)
+REM    * reaches ALL the projects you list                   (--add-dir)
 REM  Pair with install-autostart.bat so it also starts at every login.
 REM
-REM  Uses the real Claude Code flags (v2.1+):
+REM  Real Claude Code flags (v2.1+):
 REM    claude --remote-control [name] --continue --add-dir <dirs...>
 REM ============================================================================
-setlocal
+setlocal EnableDelayedExpansion
 
 REM ==== SETTINGS -- edit these ================================================
 
 REM  A stable name for this computer as it shows in the phone app:
 set "SESSION_NAME=%COMPUTERNAME%"
 
-REM  The MAIN project folder to resume in (your Ragnarok work, etc.).
-REM  --continue reopens the most recent conversation in THIS folder, so keep it
-REM  the same each time and you always land back where you left off.
+REM  The MAIN project folder to resume in (your Ragnarok work, etc.):
 set "PROJECT_DIR=%USERPROFILE%"
 
-REM  ALL your other project folders you want reachable in that one session.
-REM  Leave blank for none, or list them like:
+REM  ALL other project folders to reach in that one session. Blank, or e.g.:
 REM    set "EXTRA_DIRS=--add-dir C:\Users\%USERNAME%\RagnarokOS C:\code\stuff"
 set "EXTRA_DIRS="
 
-REM  Session behavior:  --continue = keep the same session (what you asked for).
-REM  Set to empty ("") if you ever want it to always start a fresh one instead.
+REM  Keep the same session (--continue). Set to "" to always start fresh.
 set "RESUME=--continue"
+
+REM  THE FIX for "it doesn't show up every time": re-announce every N minutes so
+REM  the PC keeps re-appearing in the app even if the link went stale while the
+REM  process was still alive. --continue lands you back on the same conversation.
+REM  Set to 0 to disable and only restart on an actual crash.
+set "REFRESH_MINUTES=15"
 
 REM ===========================================================================
 
@@ -43,7 +45,6 @@ if errorlevel 1 (
   if not "%CLAUDE_RC_NOPAUSE%"=="1" pause
   exit /b 1
 )
-
 cd /d "%PROJECT_DIR%" 2>nul
 if errorlevel 1 (
   echo [!] Project folder not found: %PROJECT_DIR%   (edit PROJECT_DIR above)
@@ -51,8 +52,8 @@ if errorlevel 1 (
   exit /b 1
 )
 
-REM  First run ever: no conversation exists yet, so start fresh (no --continue)
-REM  and drop a marker. Every run after that resumes the SAME session.
+set /a REFRESH_MS=%REFRESH_MINUTES%*60000
+
 set "MARKER=%~dp0.rc-initialized"
 set "MODE=%RESUME%"
 if not exist "%MARKER%" set "MODE="
@@ -61,16 +62,22 @@ echo ============================================================
 echo   Claude Remote-Control - Always On
 echo   Computer name : %SESSION_NAME%
 echo   Project       : %CD%
-echo   Session       : keep-same (--continue)   Extra dirs: %EXTRA_DIRS%
+echo   Re-announce   : every %REFRESH_MINUTES% min (0 = only on crash)
 echo   Open the Claude app on your phone and pick this computer.
 echo   (Close this window to stop.)
 echo ============================================================
 
 :loop
-claude --remote-control "%SESSION_NAME%" %MODE% %EXTRA_DIRS%
+if "%REFRESH_MINUTES%"=="0" (
+  claude --remote-control "%SESSION_NAME%" %MODE% %EXTRA_DIRS%
+) else (
+  REM  Run Remote Control but stop it after the refresh window, then loop
+  REM  re-announces the PC so it reliably shows up in the app.
+  powershell -NoProfile -Command "$a=@('--remote-control','%SESSION_NAME%'); if('%MODE%'.Trim()){$a+='--continue'}; $e='%EXTRA_DIRS%'.Trim(); if($e){$a+=($e -split ' +')}; $p=Start-Process claude -ArgumentList $a -PassThru -NoNewWindow; if(-not $p.WaitForExit(%REFRESH_MS%)){ try{$p.CloseMainWindow()|Out-Null; Start-Sleep 2; if(-not $p.HasExited){$p.Kill()}}catch{} }"
+)
 if not exist "%MARKER%" (echo initialized> "%MARKER%")
 set "MODE=%RESUME%"
 echo.
-echo [!] Remote Control stopped (code %errorlevel%). Reconnecting in 3s...
-timeout /t 3 /nobreak >nul
+echo [*] Re-announcing to keep the PC visible in the app...
+timeout /t 2 /nobreak >nul
 goto :loop
