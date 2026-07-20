@@ -1,0 +1,19 @@
+{
+  "name": "Claude Phone Remote",
+  "short_name": "Claude Remote",
+  "description": "Remote-control the Claude app on your PC from your phone, over WiFi.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1115",
+  "theme_color": "#0f1115",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
