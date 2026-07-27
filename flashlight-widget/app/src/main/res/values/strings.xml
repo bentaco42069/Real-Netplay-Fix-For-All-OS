@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Thor\'s Thunderous Flash</string>
+    <string name="widget_label">Thor\'s Thunderous Flash — Max Brightness</string>
+    <string name="toggle_desc">Toggle the flashlight at maximum brightness</string>
+</resources>
