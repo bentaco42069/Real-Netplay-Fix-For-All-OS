@@ -19,10 +19,10 @@ flashlight instead of the weak default.
 
 ## What you get
 
-- **A home-screen widget** shaped like **Mjölnir held ready to strike** — the
-  broad Norse hammer head up top (with its punched-dot ornament), handle and
-  pommel hanging down. Tap it → LED on at max. Tap again → off. When it's lit,
-  the hammer glows gold and a lightning bolt cracks up out of the head.
+- **A home-screen widget** made from a real **Mjölnir photo** — cut out, stood
+  upright, head on top. Tap it → LED on at max, and three lightning bolts blaze
+  gold out of the hammer's crown. Tap again → off, and the hammer dims and the
+  bolts go dead gray, so you can tell at a glance it's off.
 - **An app icon** ("Thor's Thunderous Flash") that does the same thing when tapped.
 
 ---
