@@ -19,8 +19,10 @@ flashlight instead of the weak default.
 
 ## What you get
 
-- **A home-screen widget** shaped like a little flashlight. Tap it → LED on at
-  max. Tap again → off. The icon glows yellow when it's on.
+- **A home-screen widget** shaped like a **Norse Age Mjölnir amulet** (the real
+  Viking pendant — stout body, flared lower corners, suspension loop, punched
+  dots). Tap it → LED on at max. Tap again → off. When it's lit, the hammer
+  glows gold and a lightning bolt cracks out of the top.
 - **An app icon** ("Thor's Thunderous Flash") that does the same thing when tapped.
 
 ---
