@@ -1,7 +1,6 @@
 <!--
-  Norse Age Mjölnir amulet (lit / charged) — glowing gold with a lightning
-  bolt cracking out of the top. Same authentic Viking pendant shape as the
-  unlit version, energized.
+  Mjölnir, charged (lit / gold) — broad hammer head UP top with a lightning
+  bolt cracking out of the striking face, handle hanging down.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="48dp"
@@ -9,31 +8,31 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
 
-    <!-- Lightning bolt striking out of the top. -->
+    <!-- Lightning bolt bursting up out of the top of the hammer head. -->
     <path
         android:fillColor="#FFF176"
-        android:pathData="M12.9,0.5 L10.4,4.4 L12.0,4.4 L11.1,6.6 L14.1,2.6 L12.4,2.6 Z" />
+        android:pathData="M12.9,0.4 L10.3,4.0 L12.0,4.0 L11.1,5.8 L14.2,2.2 L12.4,2.2 Z" />
 
-    <!-- Amulet body: narrow neck, broad head flaring at the lower corners. -->
+    <!-- Hammer body: broad head on top, handle down, flared pommel. -->
     <path
         android:fillColor="#FFCA28"
-        android:pathData="M10.9,4.6 L10.9,7.6 L8.0,8.6 L8.0,12.6 L7.2,13.0 L8.6,14.8 L12,14.4 L15.4,14.8 L16.8,13.0 L16.0,12.6 L16.0,8.6 L13.1,7.6 L13.1,4.6 Z" />
+        android:pathData="M7.2,4.4 L16.8,4.4 L16.1,7.6 L13.1,8.5 L13.1,18.2 L14.1,18.2 L14.1,19.8 L9.9,19.8 L9.9,18.2 L10.9,18.2 L10.9,8.5 L7.9,7.6 Z" />
 
-    <!-- Neck groove. -->
+    <!-- Central boss on the head. -->
     <path
         android:fillColor="#FF8F00"
-        android:pathData="M11.7,5.0 L12.3,5.0 L12.3,7.4 L11.7,7.4 Z" />
+        android:pathData="M12,6 m-1.1,0 a1.1,1.1 0 1,0 2.2,0 a1.1,1.1 0 1,0 -2.2,0" />
 
-    <!-- Central boss. -->
+    <!-- Punched dots either side of the boss. -->
     <path
         android:fillColor="#FF8F00"
-        android:pathData="M12,10.6 m-1.2,0 a1.2,1.2 0 1,0 2.4,0 a1.2,1.2 0 1,0 -2.4,0" />
+        android:pathData="M9.5,6 m-0.45,0 a0.45,0.45 0 1,0 0.9,0 a0.45,0.45 0 1,0 -0.9,0" />
+    <path
+        android:fillColor="#FF8F00"
+        android:pathData="M14.5,6 m-0.45,0 a0.45,0.45 0 1,0 0.9,0 a0.45,0.45 0 1,0 -0.9,0" />
 
-    <!-- Punched dots either side. -->
-    <path
-        android:fillColor="#FF8F00"
-        android:pathData="M9.6,11.4 m-0.5,0 a0.5,0.5 0 1,0 1,0 a0.5,0.5 0 1,0 -1,0" />
-    <path
-        android:fillColor="#FF8F00"
-        android:pathData="M14.4,11.4 m-0.5,0 a0.5,0.5 0 1,0 1,0 a0.5,0.5 0 1,0 -1,0" />
+    <!-- Grip wraps on the handle. -->
+    <path android:fillColor="#FF8F00" android:pathData="M10.9,11 L13.1,11 L13.1,11.7 L10.9,11.7 Z" />
+    <path android:fillColor="#FF8F00" android:pathData="M10.9,13 L13.1,13 L13.1,13.7 L10.9,13.7 Z" />
+    <path android:fillColor="#FF8F00" android:pathData="M10.9,15 L13.1,15 L13.1,15.7 L10.9,15.7 Z" />
 </vector>
