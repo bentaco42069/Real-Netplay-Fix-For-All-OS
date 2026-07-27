@@ -1,0 +1,62 @@
+name: Build Thor's Thunderous Flash APK
+
+# Builds the flashlight widget into an installable .apk in the cloud, so no
+# Android Studio (or any local tooling) is needed. The finished app is attached
+# to a GitHub Release you can download straight to your phone.
+
+on:
+  push:
+    branches:
+      - "claude/flashlight-widget-brightness-l7zp6n"
+      - "main"
+    paths:
+      - "flashlight-widget/**"
+      - ".github/workflows/build-flashlight.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up the Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install SDK packages
+        run: |
+          yes | sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" >/dev/null
+
+      - name: Build the debug APK
+        working-directory: flashlight-widget
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Rename the APK
+        run: cp flashlight-widget/app/build/outputs/apk/debug/app-debug.apk thors-thunderous-flash.apk
+
+      - name: Upload the APK as a downloadable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: thors-thunderous-flash-apk
+          path: thors-thunderous-flash.apk
+
+      - name: Publish the APK to a Release (easy phone download)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete flashlight --yes --cleanup-tag || true
+          gh release create flashlight thors-thunderous-flash.apk \
+            --title "Thor's Thunderous Flash" \
+            --notes "Tap **thors-thunderous-flash.apk** below to install. A home-screen Mjölnir widget that fires your flashlight at maximum brightness. Android 8+."
